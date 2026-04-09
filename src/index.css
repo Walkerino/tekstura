@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400&family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@1,500&display=swap');
+
+:root {
+  --container-width: 1272px;
+  --color-surface: #ffffff;
+  --color-white: #ffffff;
+  --color-vanilla: #fffbf1;
+  --color-text: #101215;
+  --color-text-muted: #505255;
+  --color-text-soft: #707275;
+  --color-placeholder: #7b7d80;
+  --color-orange: #f76403;
+  --color-orange-dark: #de5800;
+  --color-card-muted: #f6f6f6;
+  --color-card-accent: rgba(255, 175, 104, 0.2);
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  --font-geist: 'Geist', 'Inter', sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface);
+  cursor: url('/assets/classic-32.png') 6 0, auto;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a,
+button,
+label[for],
+summary,
+[role='button'],
+input[type='submit'],
+input[type='button'],
+input[type='reset'] {
+  cursor: url('/assets/pointer-32.png') 11 0, pointer;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button,
+input,
+textarea {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: 3px;
+}
+
+textarea {
+  resize: vertical;
+}
