@@ -131,14 +131,42 @@ const sliderGap = 24
 
 function useAutoSlider(length: number) {
   const viewportRef = useRef<HTMLDivElement | null>(null)
+  const pointerIdRef = useRef<number | null>(null)
+  const dragStartXRef = useRef(0)
+  const dragStartYRef = useRef(0)
+  const dragOffsetRef = useRef(0)
+  const isDraggingRef = useRef(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [stepWidth, setStepWidth] = useState(0)
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
+  const [isDragEnabled, setIsDragEnabled] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [autoplayCycle, setAutoplayCycle] = useState(0)
 
   useEffect(() => {
     setActiveIndex(0)
     setIsTransitionEnabled(true)
+    setIsDragging(false)
+    setDragOffset(0)
+    dragOffsetRef.current = 0
+    isDraggingRef.current = false
+    pointerIdRef.current = null
   }, [length])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1100px)')
+    const updateDragAvailability = () => {
+      setIsDragEnabled(mediaQuery.matches)
+    }
+
+    updateDragAvailability()
+    mediaQuery.addEventListener('change', updateDragAvailability)
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateDragAvailability)
+    }
+  }, [])
 
   useEffect(() => {
     if (length <= 0) {
@@ -165,7 +193,7 @@ function useAutoSlider(length: number) {
   }, [length])
 
   useEffect(() => {
-    if (length <= 1 || stepWidth === 0 || !isTransitionEnabled) {
+    if (length <= 1 || stepWidth === 0 || !isTransitionEnabled || isDragging) {
       return
     }
 
@@ -176,10 +204,10 @@ function useAutoSlider(length: number) {
     return () => {
       window.clearTimeout(timerId)
     }
-  }, [activeIndex, isTransitionEnabled, length, stepWidth])
+  }, [activeIndex, autoplayCycle, isDragging, isTransitionEnabled, length, stepWidth])
 
   useEffect(() => {
-    if (length <= 1 || activeIndex < length) {
+    if (length <= 1 || activeIndex < length || isDragging) {
       return
     }
 
@@ -191,7 +219,7 @@ function useAutoSlider(length: number) {
     return () => {
       window.clearTimeout(resetTimerId)
     }
-  }, [activeIndex, length])
+  }, [activeIndex, isDragging, length])
 
   useEffect(() => {
     if (isTransitionEnabled) {
@@ -213,9 +241,119 @@ function useAutoSlider(length: number) {
     }
   }, [isTransitionEnabled])
 
+  const resetAutoplayTimer = () => {
+    setAutoplayCycle((current) => current + 1)
+  }
+
+  const releasePointer = () => {
+    const pointerId = pointerIdRef.current
+
+    if (pointerId !== null && viewportRef.current?.hasPointerCapture(pointerId)) {
+      viewportRef.current.releasePointerCapture(pointerId)
+    }
+  }
+
+  const resetDraggingState = () => {
+    pointerIdRef.current = null
+    dragOffsetRef.current = 0
+    isDraggingRef.current = false
+    setDragOffset(0)
+    setIsDragging(false)
+  }
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isDragEnabled || length <= 1 || stepWidth === 0) {
+      return
+    }
+
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return
+    }
+
+    pointerIdRef.current = event.pointerId
+    dragStartXRef.current = event.clientX
+    dragStartYRef.current = event.clientY
+    dragOffsetRef.current = 0
+    isDraggingRef.current = false
+    setDragOffset(0)
+    setIsDragging(false)
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId || !isDragEnabled || length <= 1) {
+      return
+    }
+
+    const deltaX = event.clientX - dragStartXRef.current
+    const deltaY = event.clientY - dragStartYRef.current
+
+    if (!isDraggingRef.current) {
+      if (Math.abs(deltaX) < 8 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+        return
+      }
+
+      viewportRef.current?.setPointerCapture(event.pointerId)
+      isDraggingRef.current = true
+      setIsDragging(true)
+    }
+
+    event.preventDefault()
+    dragOffsetRef.current = deltaX
+    setDragOffset(deltaX)
+  }
+
+  const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) {
+      return
+    }
+
+    releasePointer()
+
+    if (!isDraggingRef.current) {
+      resetDraggingState()
+      return
+    }
+
+    const swipeThreshold = Math.min(stepWidth * 0.18, 96)
+    const currentOffset = dragOffsetRef.current
+
+    let nextIndex = activeIndex
+
+    if (currentOffset <= -swipeThreshold) {
+      nextIndex = Math.min(activeIndex + 1, length)
+    } else if (currentOffset >= swipeThreshold) {
+      nextIndex = Math.max(activeIndex - 1, 0)
+    }
+
+    resetDraggingState()
+
+    if (nextIndex !== activeIndex) {
+      setActiveIndex(nextIndex)
+    }
+
+    resetAutoplayTimer()
+  }
+
+  const onPointerCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) {
+      return
+    }
+
+    releasePointer()
+    resetDraggingState()
+    resetAutoplayTimer()
+  }
+
   return {
     viewportRef,
     activeIndex,
+    dragOffset,
+    isDragEnabled,
+    isDragging,
+    onPointerCancel,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
     visibleIndex: length === 0 ? 0 : activeIndex % length,
     isTransitionEnabled,
     trackOffset: activeIndex * stepWidth,
@@ -312,8 +450,6 @@ function LandingPage() {
               </span>
             </h1>
 
-            <div className="hero__divider" aria-hidden="true" />
-
             <p className="hero__description">
               <span>Текстура</span> — студия дизайна, где визуальная выразительность
               сочетается с понятной структурой, бизнес-логикой и вниманием к деталям.
@@ -406,6 +542,19 @@ function LandingPage() {
                 </article>
               ))}
             </div>
+
+            <div className="cases__controls">
+              <div className="slider-dots cases__dots" aria-hidden="true">
+                <span className="slider-dots__dot slider-dots__dot--active" />
+                <span className="slider-dots__dot" />
+                <span className="slider-dots__dot" />
+                <span className="slider-dots__dot" />
+              </div>
+
+              <a className="button button--primary cases__mobile-cta" href="#contact">
+                Все работы →
+              </a>
+            </div>
           </div>
         </section>
 
@@ -445,14 +594,22 @@ function LandingPage() {
             <h2 className="section-title reviews__title">Отзывы</h2>
 
             <div className="slider slider--reviews">
-              <div className="slider__viewport" ref={reviewsSlider.viewportRef}>
+              <div
+                className={`slider__viewport${reviewsSlider.isDragEnabled ? ' slider__viewport--interactive' : ''}${reviewsSlider.isDragging ? ' slider__viewport--dragging' : ''}`}
+                ref={reviewsSlider.viewportRef}
+                onPointerDown={reviewsSlider.onPointerDown}
+                onPointerMove={reviewsSlider.onPointerMove}
+                onPointerUp={reviewsSlider.onPointerUp}
+                onPointerCancel={reviewsSlider.onPointerCancel}
+              >
                 <div
                   className="slider__track"
                   style={{
-                    transform: `translateX(-${reviewsSlider.trackOffset}px)`,
-                    transitionDuration: reviewsSlider.isTransitionEnabled
-                      ? `${sliderTransitionDuration}ms`
-                      : '0ms',
+                    transform: `translateX(${reviewsSlider.dragOffset - reviewsSlider.trackOffset}px)`,
+                    transitionDuration:
+                      reviewsSlider.isDragging || !reviewsSlider.isTransitionEnabled
+                        ? '0ms'
+                        : `${sliderTransitionDuration}ms`,
                   }}
                 >
                   {testimonialSlides.map((item, index) => (
@@ -490,14 +647,22 @@ function LandingPage() {
             </h2>
 
             <div className="slider slider--news">
-              <div className="slider__viewport" ref={newsSlider.viewportRef}>
+              <div
+                className={`slider__viewport${newsSlider.isDragEnabled ? ' slider__viewport--interactive' : ''}${newsSlider.isDragging ? ' slider__viewport--dragging' : ''}`}
+                ref={newsSlider.viewportRef}
+                onPointerDown={newsSlider.onPointerDown}
+                onPointerMove={newsSlider.onPointerMove}
+                onPointerUp={newsSlider.onPointerUp}
+                onPointerCancel={newsSlider.onPointerCancel}
+              >
                 <div
                   className="slider__track"
                   style={{
-                    transform: `translateX(-${newsSlider.trackOffset}px)`,
-                    transitionDuration: newsSlider.isTransitionEnabled
-                      ? `${sliderTransitionDuration}ms`
-                      : '0ms',
+                    transform: `translateX(${newsSlider.dragOffset - newsSlider.trackOffset}px)`,
+                    transitionDuration:
+                      newsSlider.isDragging || !newsSlider.isTransitionEnabled
+                        ? '0ms'
+                        : `${sliderTransitionDuration}ms`,
                   }}
                 >
                   {newsSlides.map((item, index) => (
@@ -562,6 +727,10 @@ function LandingPage() {
             <div className="contact__heading">
               <h2 className="section-title">Остались вопросы?</h2>
               <p className="contact__subtitle">С радостью ответим на них</p>
+              <p className="contact__mobile-title">
+                <span>С радостью ответим</span>
+                <span>на вопросы</span>
+              </p>
             </div>
 
             <div className="contact__grid">
