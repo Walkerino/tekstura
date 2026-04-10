@@ -1,9 +1,11 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { FacebookIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from './components/icons'
-import { footerPrimaryLinks, footerSecondaryLinks, navigation } from './data/site'
+import SiteFooter from './components/SiteFooter'
+import SiteHeader from './components/SiteHeader'
 import { usePathname } from './hooks/usePathname'
 import NotFoundPage from './pages/NotFound'
+import PrivacyPolicyPage from './pages/PrivacyPolicy'
+import PublicOfferPage from './pages/PublicOffer'
 import './App.css'
 
 type Service = {
@@ -221,7 +223,6 @@ function useAutoSlider(length: number) {
 }
 
 function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [modalState, setModalState] = useState<ModalState>(null)
   const [heroVariantIndex, setHeroVariantIndex] = useState(0)
   const [typedHeroText, setTypedHeroText] = useState('')
@@ -236,13 +237,12 @@ function LandingPage() {
   const newsSlides = [...newsItems, ...newsItems]
 
   useEffect(() => {
-    if (!isMenuOpen && !modalState) {
+    if (!modalState) {
       return
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsMenuOpen(false)
         setModalState(null)
       }
     }
@@ -255,11 +255,10 @@ function LandingPage() {
       document.body.style.overflow = previousOverflow
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isMenuOpen, modalState])
+  }, [modalState])
 
   const openSuccessModal = (message: string) => {
     setModalState({ message })
-    setIsMenuOpen(false)
   }
 
   useEffect(() => {
@@ -299,59 +298,7 @@ function LandingPage() {
     <div className="page-shell">
       <div className="page-shell__glow" aria-hidden="true" />
 
-      <header className="site-header">
-        <div className="container site-header__inner">
-          <a className="brand" href="#top" aria-label="Tekstura">
-            <img className="brand__image" src="/assets/logo.png" alt="Tekstura" />
-          </a>
-
-          <nav className="site-nav" aria-label="Основная навигация">
-            {navigation.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <a className="button button--primary button--small header-cta" href="#audit">
-            Бесплатный аудит
-          </a>
-
-          <button
-            className={`menu-toggle${isMenuOpen ? ' menu-toggle--active' : ''}`}
-            type="button"
-            aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
-            aria-controls="mobile-menu"
-            aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen((current) => !current)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-      </header>
-
-      {isMenuOpen ? (
-        <div className="mobile-menu" id="mobile-menu">
-          <div className="mobile-menu__panel">
-            <nav className="mobile-menu__nav" aria-label="Мобильная навигация">
-              {navigation.map((item) => (
-                <a key={item.href} href={item.href} onClick={() => setIsMenuOpen(false)}>
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-            <a
-              className="button button--primary"
-              href="#audit"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Бесплатный аудит
-            </a>
-          </div>
-        </div>
-      ) : null}
+      <SiteHeader homeHref="#top" auditHref="#audit" />
 
       <main id="top">
         <section className="hero">
@@ -661,59 +608,7 @@ function LandingPage() {
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div className="container site-footer__top">
-          <div className="site-footer__brand">
-            <img src="/assets/logo-footer.svg" alt="Tekstura" />
-            <p>
-              Создаем брендинг, сайты и digital-дизайн для бизнеса, которому важны
-              качество, ясность и сильная визуальная подача.
-            </p>
-          </div>
-
-          <div className="site-footer__nav">
-            <div className="site-footer__column">
-              <h3>Навигация</h3>
-              {footerPrimaryLinks.map((item) => (
-                <a key={item.href} href={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </div>
-
-            <div className="site-footer__column site-footer__column--secondary">
-              {footerSecondaryLinks.map((item) => (
-                <a key={item.href} href={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="container site-footer__bottom">
-          <div className="site-footer__meta">
-            <span>© 2026 TEKSTURA. Все права защищены.</span>
-            <a href="/">Политика конфиденциальности</a>
-            <a href="/">Публичная оферта</a>
-          </div>
-
-          <div className="site-footer__socials" aria-label="Социальные сети">
-            <a href="/" aria-label="Facebook">
-              <FacebookIcon />
-            </a>
-            <a href="/" aria-label="Instagram">
-              <InstagramIcon />
-            </a>
-            <a href="/" aria-label="LinkedIn">
-              <LinkedinIcon />
-            </a>
-            <a href="/" aria-label="YouTube">
-              <YoutubeIcon />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {modalState ? (
         <div className="modal-backdrop" role="presentation" onClick={() => setModalState(null)}>
@@ -741,9 +636,25 @@ function LandingPage() {
 
 function App() {
   const pathname = usePathname()
-  const isHome = pathname === '/' || pathname === '/index.html'
+  const normalizedPathname =
+    pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+  const isHome = normalizedPathname === '/' || normalizedPathname === '/index.html'
+  const isPrivacyPolicy = normalizedPathname === '/privacy-policy'
+  const isPublicOffer = normalizedPathname === '/public-offer'
 
-  return isHome ? <LandingPage /> : <NotFoundPage />
+  if (isHome) {
+    return <LandingPage />
+  }
+
+  if (isPrivacyPolicy) {
+    return <PrivacyPolicyPage />
+  }
+
+  if (isPublicOffer) {
+    return <PublicOfferPage />
+  }
+
+  return <NotFoundPage />
 }
 
 export default App
