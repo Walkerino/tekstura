@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CaseItem {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  title         String
+  tag           String
+  coverImageUrl String
+  isPublished   Boolean     @default(false)
+  sortOrder     Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  images        CaseImage[]
+}
+
+model CaseImage {
+  id        String   @id @default(cuid())
+  caseId    String
+  imageUrl  String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  case      CaseItem @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+}
+
+model ReviewItem {
+  id          String   @id @default(cuid())
+  logoUrl     String
+  quote       String
+  authorName  String?
+  authorRole  String?
+  isPublished Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NewsPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  publishedAt DateTime
+  title       String
+  content     String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditRequest {
+  id        String        @id @default(cuid())
+  email     String
+  source    String?
+  status    String        @default("NEW")
+  createdAt DateTime      @default(now())
+}
+
+model ContactRequest {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  status    String        @default("NEW")
+  createdAt DateTime      @default(now())
+}
