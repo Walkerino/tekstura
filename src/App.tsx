@@ -1,11 +1,10 @@
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { FacebookIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from './components/icons'
+import { footerPrimaryLinks, footerSecondaryLinks, navigation } from './data/site'
+import { usePathname } from './hooks/usePathname'
+import NotFoundPage from './pages/NotFound'
 import './App.css'
-
-type NavItem = {
-  label: string
-  href: string
-}
 
 type Service = {
   icon: string
@@ -36,15 +35,6 @@ type NewsItem = {
 type ModalState = {
   message: string
 } | null
-
-const navigation: NavItem[] = [
-  { label: 'О нас', href: '#about' },
-  { label: 'Услуги', href: '#services' },
-  { label: 'Кейсы', href: '#cases' },
-  { label: 'Отзывы', href: '#reviews' },
-  { label: 'Новости', href: '#news' },
-  { label: 'Контакты', href: '#contact' },
-]
 
 const services: Service[] = [
   {
@@ -132,129 +122,10 @@ const newsItems: NewsItem[] = [
   },
 ]
 
-const footerPrimaryLinks = navigation.slice(0, 3)
-const footerSecondaryLinks = navigation.slice(3)
 const heroTitleVariants = ['брендов', 'продуктов', 'бизнеса']
 const sliderStepDelay = 7000
 const sliderTransitionDuration = 720
 const sliderGap = 24
-
-const digitHandles = [
-  { left: '18.9%', top: '20.6%' },
-  { left: '27.1%', top: '20.6%' },
-  { left: '6.5%', top: '56.7%' },
-  { left: '61.4%', top: '56.7%' },
-  { left: '6.3%', top: '65.7%' },
-  { left: '61.2%', top: '65.7%' },
-  { left: '13%', top: '56.2%' },
-  { left: '67.9%', top: '56.2%' },
-  { left: '21%', top: '56.2%' },
-  { left: '20.9%', top: '33%' },
-  { left: '27.3%', top: '56.2%' },
-  { left: '31.2%', top: '56.2%' },
-  { left: '39.8%', top: '48.8%' },
-  { left: '41%', top: '59.9%' },
-  { left: '40.4%', top: '38.2%' },
-  { left: '45.9%', top: '29.3%' },
-  { left: '45.9%', top: '19.6%' },
-  { left: '54%', top: '25.1%' },
-  { left: '37.5%', top: '25.1%' },
-  { left: '57.6%', top: '35.9%' },
-  { left: '34.3%', top: '35.9%' },
-  { left: '58.5%', top: '48.8%' },
-  { left: '33.4%', top: '47.7%' },
-  { left: '57%', top: '63.6%' },
-  { left: '34.8%', top: '63.6%' },
-  { left: '52.2%', top: '73.3%' },
-  { left: '45.9%', top: '76.4%' },
-  { left: '38.8%', top: '72.3%' },
-  { left: '51%', top: '38.2%' },
-  { left: '51%', top: '59.9%' },
-  { left: '45.9%', top: '66.7%' },
-  { left: '51.6%', top: '48.8%' },
-  { left: '31.2%', top: '65.7%' },
-  { left: '27.3%', top: '65.7%' },
-  { left: '27.3%', top: '75.9%' },
-  { left: '21%', top: '75.9%' },
-  { left: '21%', top: '65.7%' },
-]
-
-function ArrowUpRightIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20">
-      <path
-        d="M6 14L14 6M8 6H14V12"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-    </svg>
-  )
-}
-
-function FacebookIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16">
-      <path
-        d="M9.2 14V8.72H11l.27-2.2H9.2V5.1c0-.64.17-1.08 1.08-1.08h1.14V2.05C11.22 2.02 10.74 2 10.17 2 8.48 2 7.33 3.03 7.33 4.93v1.59H5.5v2.2h1.83V14H9.2Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function InstagramIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16">
-      <path
-        d="M4.56 2h6.88A2.56 2.56 0 0 1 14 4.56v6.88A2.56 2.56 0 0 1 11.44 14H4.56A2.56 2.56 0 0 1 2 11.44V4.56A2.56 2.56 0 0 1 4.56 2Zm0 1.14c-.78 0-1.42.64-1.42 1.42v6.88c0 .78.64 1.42 1.42 1.42h6.88c.78 0 1.42-.64 1.42-1.42V4.56c0-.78-.64-1.42-1.42-1.42H4.56Zm6.13.84a.72.72 0 1 1 0 1.44.72.72 0 0 1 0-1.44ZM8 4.86A3.14 3.14 0 1 1 4.86 8 3.14 3.14 0 0 1 8 4.86Zm0 1.14A2 2 0 1 0 10 8 2 2 0 0 0 8 6Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function LinkedinIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16">
-      <path
-        d="M3.44 5.16H1V15h2.44V5.16Zm.16-3.04A1.41 1.41 0 1 0 3.58 5a1.41 1.41 0 0 0 .02-2.88ZM15 9c0-2.6-1.39-3.81-3.24-3.81A2.8 2.8 0 0 0 9.24 6.6V5.16H6.89c.03.95 0 9.84 0 9.84h2.35V9.5c0-.3.02-.6.11-.82a1.54 1.54 0 0 1 1.45-1.03c1.02 0 1.43.78 1.43 1.92V15H15V9Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function YoutubeIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16">
-      <path
-        d="M14.67 4.62a1.9 1.9 0 0 0-1.34-1.34C12.15 3 8 3 8 3s-4.15 0-5.33.28A1.9 1.9 0 0 0 1.33 4.62 19.73 19.73 0 0 0 1 8a19.73 19.73 0 0 0 .33 3.38 1.9 1.9 0 0 0 1.34 1.34C3.85 13 8 13 8 13s4.15 0 5.33-.28a1.9 1.9 0 0 0 1.34-1.34A19.73 19.73 0 0 0 15 8a19.73 19.73 0 0 0-.33-3.38ZM6.68 10.1V5.9L10.3 8 6.68 10.1Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function usePathname() {
-  const [pathname, setPathname] = useState(window.location.pathname)
-
-  useEffect(() => {
-    const updatePathname = () => {
-      setPathname(window.location.pathname)
-    }
-
-    window.addEventListener('popstate', updatePathname)
-
-    return () => {
-      window.removeEventListener('popstate', updatePathname)
-    }
-  }, [])
-
-  return pathname
-}
 
 function useAutoSlider(length: number) {
   const viewportRef = useRef<HTMLDivElement | null>(null)
@@ -868,147 +739,11 @@ function LandingPage() {
   )
 }
 
-function ErrorPage() {
-  const handleGoBack = () => {
-    if (window.history.length > 1) {
-      window.history.back()
-      return
-    }
-
-    window.location.assign('/')
-  }
-
-  return (
-    <div className="error-page">
-      <div className="error-page__glow" aria-hidden="true" />
-      <div className="error-page__texture" aria-hidden="true" />
-
-      <header className="error-header">
-        <div className="error-shell error-header__inner">
-          <a className="error-brand" href="/" aria-label="Tekstura">
-            <img src="/assets/logo-footer.svg" alt="Tekstura" />
-          </a>
-
-          <nav className="error-nav" aria-label="Основная навигация">
-            {navigation.map((item) => (
-              <a key={item.href} href={`/${item.href}`}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <button className="error-header__cta" type="button" onClick={handleGoBack}>
-            Вернуться
-          </button>
-        </div>
-      </header>
-
-      <main className="error-main">
-        <section className="error-hero" aria-labelledby="error-title">
-          <div className="error-hero__art" aria-hidden="true">
-            <div className="error-hero__frame">
-              <span className="error-hero__corner error-hero__corner--top-left" />
-              <span className="error-hero__corner error-hero__corner--top-right" />
-              <span className="error-hero__corner error-hero__corner--bottom-right" />
-              <span className="error-hero__corner error-hero__corner--bottom-left" />
-              <div className="error-hero__digits">404</div>
-              {digitHandles.map((handle) => (
-                <span
-                  key={`${handle.left}-${handle.top}`}
-                  className="error-hero__handle"
-                  style={{ left: handle.left, top: handle.top }}
-                />
-              ))}
-            </div>
-
-            <img className="error-hero__pointer" src="/assets/pointer-32.png" alt="" />
-          </div>
-
-          <div className="error-hero__copy">
-            <h1 className="error-hero__title" id="error-title">
-              <span>Упс! Страницы, которую вы ищете,</span>
-              <span>
-                <em>не существует</em>
-              </span>
-            </h1>
-
-            <button className="error-hero__button" type="button" onClick={handleGoBack}>
-              <span>Вернуться назад</span>
-              <span className="error-hero__button-icon">
-                <ArrowUpRightIcon />
-              </span>
-            </button>
-          </div>
-        </section>
-      </main>
-
-      <footer className="error-footer">
-        <div className="error-shell error-footer__inner">
-          <div className="error-footer__top">
-            <div className="error-footer__brand">
-              <a className="error-brand error-brand--footer" href="/" aria-label="Tekstura">
-                <img src="/assets/logo-footer.svg" alt="Tekstura" />
-              </a>
-              <p>
-                Создаем брендинг, сайты и digital-дизайн для бизнеса, которому важны
-                качество, ясность и сильная визуальная подача.
-              </p>
-            </div>
-
-            <div className="error-footer__nav-group">
-              <h2>Навигация</h2>
-              <div className="error-footer__nav-columns">
-                <div className="error-footer__nav-column">
-                  {footerPrimaryLinks.map((item) => (
-                    <a key={item.href} href={`/${item.href}`}>
-                      {item.label}
-                    </a>
-                  ))}
-                </div>
-                <div className="error-footer__nav-column">
-                  {footerSecondaryLinks.map((item) => (
-                    <a key={item.href} href={`/${item.href}`}>
-                      {item.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="error-footer__bottom">
-            <div className="error-footer__meta">
-              <span>© 2026 TEKSTURA. Все права защищены.</span>
-              <a href="/">Политика конфиденциальности</a>
-              <a href="/">Публичная оферта</a>
-            </div>
-
-            <div className="error-footer__socials" aria-label="Социальные сети">
-              <a href="/" aria-label="Facebook">
-                <FacebookIcon />
-              </a>
-              <a href="/" aria-label="Instagram">
-                <InstagramIcon />
-              </a>
-              <a href="/" aria-label="LinkedIn">
-                <LinkedinIcon />
-              </a>
-              <a href="/" aria-label="YouTube">
-                <YoutubeIcon />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
-}
-
 function App() {
   const pathname = usePathname()
   const isHome = pathname === '/' || pathname === '/index.html'
 
-  return isHome ? <LandingPage /> : <ErrorPage />
+  return isHome ? <LandingPage /> : <NotFoundPage />
 }
 
 export default App
