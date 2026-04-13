@@ -1,6 +1,7 @@
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowIcon } from '../components/icons'
 import SiteFooter from '../components/SiteFooter'
 import SiteHeader from '../components/SiteHeader'
 import { fetchCases, fetchNews, fetchReviews, submitAuditForm, submitContactForm } from '../lib/api'
@@ -506,9 +507,10 @@ export default function HomePage() {
                   key={item.id}
                   className={`case-card case-card--portfolio${index === 0 ? ' case-card--wide' : ''}`}
                   style={{
-                    backgroundImage: `linear-gradient(rgba(16, 18, 21, 0.08), rgba(16, 18, 21, 0.08)), url(${item.coverImageUrl})`,
+                    backgroundImage: `url(${item.coverImageUrl})`,
                     backgroundPosition: 'center',
-                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'contain',
                   }}
                 >
                   <Link className="case-card__link" to={`/cases/${item.slug}`}>
@@ -516,15 +518,19 @@ export default function HomePage() {
                       <h3>{item.title}</h3>
                       <span className="case-card__category">{item.tag}</span>
                     </div>
-                    <span className="case-card__hover-label">Взглянуть работу -&gt;</span>
+                    <span className="case-card__hover-label">
+                      <span>Взглянуть работу</span>
+                      <ArrowIcon className="arrow-icon" />
+                    </span>
                   </Link>
                 </article>
               ))}
 
               <article className="case-card case-card--cta">
-                <a className="case-card__cta" href="#contact">
-                  <span>Все работы →</span>
-                </a>
+                <Link className="case-card__cta" to="/cases">
+                  <span>Все работы</span>
+                  <ArrowIcon className="arrow-icon" />
+                </Link>
               </article>
             </div>
 
@@ -533,9 +539,10 @@ export default function HomePage() {
             ) : null}
 
             <div className="cases__controls">
-              <a className="button button--primary cases__mobile-cta" href="#contact">
-                Все работы →
-              </a>
+              <Link className="button button--primary cases__mobile-cta" to="/cases">
+                <span>Все работы</span>
+                <ArrowIcon className="arrow-icon" />
+              </Link>
             </div>
           </div>
         </section>
@@ -764,13 +771,13 @@ export default function HomePage() {
                   </p>
 
                   <div className="contact__links">
-                    <a href="https://t.me/" target="_blank" rel="noreferrer">
-                      @telegram
+                    {/* <a href="https://t.me/teksturadesign" target="_blank" rel="noreferrer">
+                      @teksturadesign
                     </a>
-                    <a href="https://instagram.com/" target="_blank" rel="noreferrer">
-                      @instagram
-                    </a>
-                    <a href="mailto:tekstura@mail.ru">tekstura@mail.ru</a>
+                    <a href="https://instagram.com/tekstura_design" target="_blank" rel="noreferrer">
+                      @tekstura_design
+                    </a> */}
+                    <a href="mailto:ann.tereshko@mail.ru">ann.tereshko@mail.ru</a>
                   </div>
                 </div>
               </div>
@@ -861,6 +868,11 @@ export default function HomePage() {
             aria-label="Сообщение"
             onClick={(event) => event.stopPropagation()}
           >
+            <div className="modal-success-icon" aria-hidden="true">
+              <svg viewBox="0 0 28 28" focusable="false" aria-hidden="true">
+                <path d="M7.5 14.5L12 19L20.5 10.5" />
+              </svg>
+            </div>
             <p>{modalState.message}</p>
             <button
               className="button button--primary button--small"

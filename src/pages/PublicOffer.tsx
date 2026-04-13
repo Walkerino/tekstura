@@ -1,6 +1,6 @@
 import SiteFooter from '../components/SiteFooter'
 import SiteHeader from '../components/SiteHeader'
-import { introParagraphs, legalSections } from '../data/legal'
+import { publicOfferIntroParagraphs, publicOfferSections } from '../data/publicOffer'
 
 const getHomeAnchorHref = (href: string) => `/${href}`
 
@@ -22,14 +22,14 @@ export default function PublicOfferPage() {
 
             <div className="privacy-policy__card">
               <div className="privacy-policy__intro">
-                {introParagraphs.map((paragraph, index) => (
+                {publicOfferIntroParagraphs.map((paragraph, index) => (
                   <p key={index} className="privacy-policy__paragraph">
                     {paragraph}
                   </p>
                 ))}
               </div>
 
-              {legalSections.map((section) => (
+              {publicOfferSections.map((section) => (
                 <section key={section.number} className="privacy-policy__section">
                   <h2 className="privacy-policy__section-title">
                     <span className="privacy-policy__section-number">{section.number}.</span>

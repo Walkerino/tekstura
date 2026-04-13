@@ -1,16 +1,20 @@
-export function ArrowUpRightIcon() {
+type ArrowIconProps = {
+  className?: string
+  direction?: 'left' | 'right'
+}
+
+export function ArrowIcon({ className, direction = 'right' }: ArrowIconProps) {
+  const arrowPath = <path d="M2.29508 8L0 6H27.541L20.6557 2L22.377 0L35 8H2.29508Z" fill="currentColor" />
+
   return (
-    <svg aria-hidden="true" viewBox="0 0 20 20">
-      <path
-        d="M6 14L14 6M8 6H14V12"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
+    <svg aria-hidden="true" className={className} viewBox="0 0 35 8" fill="none">
+      {direction === 'left' ? <g transform="rotate(180 17.5 4)">{arrowPath}</g> : arrowPath}
     </svg>
   )
+}
+
+export function ArrowUpRightIcon() {
+  return <ArrowIcon />
 }
 
 export function FacebookIcon() {
@@ -29,6 +33,17 @@ export function InstagramIcon() {
     <svg aria-hidden="true" viewBox="0 0 16 16">
       <path
         d="M4.56 2h6.88A2.56 2.56 0 0 1 14 4.56v6.88A2.56 2.56 0 0 1 11.44 14H4.56A2.56 2.56 0 0 1 2 11.44V4.56A2.56 2.56 0 0 1 4.56 2Zm0 1.14c-.78 0-1.42.64-1.42 1.42v6.88c0 .78.64 1.42 1.42 1.42h6.88c.78 0 1.42-.64 1.42-1.42V4.56c0-.78-.64-1.42-1.42-1.42H4.56Zm6.13.84a.72.72 0 1 1 0 1.44.72.72 0 0 1 0-1.44ZM8 4.86A3.14 3.14 0 1 1 4.86 8 3.14 3.14 0 0 1 8 4.86Zm0 1.14A2 2 0 1 0 10 8 2 2 0 0 0 8 6Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+export function TelegramIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16">
+      <path
+        d="M14.55 2.4a.82.82 0 0 0-.86-.11L1.53 7.2a.82.82 0 0 0 .07 1.54l3.2 1.01 1.17 3.73a.82.82 0 0 0 1.45.24l1.85-2.4 3.35 2.46a.82.82 0 0 0 1.29-.5l1.2-10.08a.82.82 0 0 0-.56-.8Zm-2.26 2.33-5.41 5.6-.47 1.76-.69-2.2-2.23-.7 8.8-3.5Z"
         fill="currentColor"
       />
     </svg>

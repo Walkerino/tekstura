@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { ArrowIcon } from '../../components/icons'
 import { getAdminSession, loginAdmin } from '../../lib/api'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
@@ -126,8 +127,9 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <Link className="text-sm text-muted-foreground hover:text-foreground" to="/">
-            ← Вернуться на сайт
+          <Link className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" to="/">
+            <ArrowIcon className="arrow-icon" direction="left" />
+            <span>Вернуться на сайт</span>
           </Link>
         </CardContent>
       </Card>

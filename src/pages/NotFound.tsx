@@ -1,4 +1,4 @@
-import { ArrowUpRightIcon } from '../components/icons'
+import { ArrowIcon } from '../components/icons'
 import SiteFooter from '../components/SiteFooter'
 import SiteHeader from '../components/SiteHeader'
 import { digitHandles } from '../data/site'
@@ -58,7 +58,7 @@ export default function NotFoundPage() {
             <button className="error-hero__button" type="button" onClick={handleGoBack}>
               <span>Вернуться назад</span>
               <span className="error-hero__button-icon">
-                <ArrowUpRightIcon />
+                <ArrowIcon className="arrow-icon" />
               </span>
             </button>
           </div>

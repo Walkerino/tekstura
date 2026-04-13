@@ -1,4 +1,4 @@
-import { FacebookIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from './icons'
+import { InstagramIcon, TelegramIcon } from './icons'
 import { footerPrimaryLinks, footerSecondaryLinks } from '../data/site'
 
 type SocialMode = 'compact' | 'full'
@@ -16,24 +16,14 @@ const defaultOfferHref = '/public-offer'
 
 const socialLinks = [
   {
-    href: '/',
-    label: 'Facebook',
-    Icon: FacebookIcon,
-  },
-  {
-    href: '/',
+    href: 'https://instagram.com/tekstura_design',
     label: 'Instagram',
     Icon: InstagramIcon,
   },
   {
-    href: '/',
-    label: 'LinkedIn',
-    Icon: LinkedinIcon,
-  },
-  {
-    href: '/',
-    label: 'YouTube',
-    Icon: YoutubeIcon,
+    href: 'https://t.me/teksturadesign',
+    label: 'Telegram',
+    Icon: TelegramIcon,
   },
 ]
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ArrowIcon } from '../../components/icons'
 import { Button, buttonVariants } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
@@ -73,8 +74,12 @@ export default function AdminNewsEditorPage() {
     <section className="space-y-4">
       <Card>
         <CardHeader>
-          <Link className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto p-0 text-muted-foreground')} to="/admin/news">
-            ← К списку новостей
+          <Link
+            className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto gap-2 p-0 text-muted-foreground')}
+            to="/admin/news"
+          >
+            <ArrowIcon className="h-2 w-[35px] shrink-0" direction="left" />
+            <span>К списку новостей</span>
           </Link>
           <CardTitle>{isNew ? 'Новая новость' : 'Редактирование новости'}</CardTitle>
           <CardDescription>Дата публикации хранится как дата, а на сайте выводится в русском формате.</CardDescription>

@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import GalleryUploadField from '../../components/admin/GalleryUploadField'
 import ImageUploadField from '../../components/admin/ImageUploadField'
+import { ArrowIcon } from '../../components/icons'
 import { Button, buttonVariants } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
+import { Textarea } from '../../components/ui/textarea'
 import { deleteAdminCase, fetchAdminCase, saveAdminCase } from '../../lib/api'
 import { cn } from '../../lib/utils'
 import type { AdminCasePayload } from '../../types/content'
 
 const emptyForm: AdminCasePayload = {
   coverImageUrl: '',
+  description: '',
   galleryImages: [],
   tag: '',
   title: '',
@@ -44,6 +47,7 @@ export default function AdminCaseEditorPage() {
 
         setForm({
           coverImageUrl: item.coverImageUrl,
+          description: item.description,
           galleryImages: item.galleryImages,
           tag: item.tag,
           title: item.title,
@@ -71,11 +75,17 @@ export default function AdminCaseEditorPage() {
     <section className="space-y-4">
       <Card>
         <CardHeader>
-          <Link className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto p-0 text-muted-foreground')} to="/admin/cases">
-            ← К списку кейсов
+          <Link
+            className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto gap-2 p-0 text-muted-foreground')}
+            to="/admin/cases"
+          >
+            <ArrowIcon className="h-2 w-[35px] shrink-0" direction="left" />
+            <span>К списку кейсов</span>
           </Link>
           <CardTitle>{isNew ? 'Новый кейс' : 'Редактирование кейса'}</CardTitle>
-          <CardDescription>Заполните заголовок, тег, обложку и галерею изображений.</CardDescription>
+          <CardDescription>
+            Заполните заголовок, описание, тег, обложку и галерею изображений.
+          </CardDescription>
         </CardHeader>
       </Card>
 
@@ -105,7 +115,7 @@ export default function AdminCaseEditorPage() {
             }
           }}
         >
-          <Card>
+        <Card>
             <CardContent className="grid gap-4 p-6 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="case-title">Заголовок</Label>
@@ -123,6 +133,19 @@ export default function AdminCaseEditorPage() {
                   id="case-tag"
                   value={form.tag}
                   onChange={(event) => setForm((current) => ({ ...current, tag: event.target.value }))}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="case-description">Описание кейса</Label>
+                <Textarea
+                  id="case-description"
+                  value={form.description}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, description: event.target.value }))
+                  }
+                  rows={4}
                   required
                 />
               </div>

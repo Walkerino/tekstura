@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { ArrowIcon } from '../components/icons'
 import SiteFooter from '../components/SiteFooter'
 import SiteHeader from '../components/SiteHeader'
 import { fetchNewsItem } from '../lib/api'
@@ -57,7 +58,8 @@ export default function NewsDetailPage() {
         <section className="detail-hero">
           <div className="container detail-hero__content">
             <Link className="detail-back" to="/">
-              ← На главную
+              <ArrowIcon className="arrow-icon" direction="left" />
+              <span>На главную</span>
             </Link>
 
             {status === 'loading' ? <p className="detail-message">Загружаем новость...</p> : null}

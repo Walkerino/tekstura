@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ImageUploadField from '../../components/admin/ImageUploadField'
+import { ArrowIcon } from '../../components/icons'
 import { Button, buttonVariants } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Label } from '../../components/ui/label'
@@ -69,8 +70,12 @@ export default function AdminReviewEditorPage() {
     <section className="space-y-4">
       <Card>
         <CardHeader>
-          <Link className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto p-0 text-muted-foreground')} to="/admin/reviews">
-            ← К списку отзывов
+          <Link
+            className={cn(buttonVariants({ variant: 'link', size: 'sm' }), 'h-auto gap-2 p-0 text-muted-foreground')}
+            to="/admin/reviews"
+          >
+            <ArrowIcon className="h-2 w-[35px] shrink-0" direction="left" />
+            <span>К списку отзывов</span>
           </Link>
           <CardTitle>{isNew ? 'Новый отзыв' : 'Редактирование отзыва'}</CardTitle>
           <CardDescription>Логотип и текст — основной сценарий для редактирования блока отзывов.</CardDescription>
