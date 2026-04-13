@@ -234,6 +234,33 @@ npm run start
 - API доступно по `/api/*`;
 - загруженные изображения раздаются по `/uploads/*`.
 
+## Автодеплой из `main` (GitHub Actions)
+
+В репозитории добавлен workflow: `.github/workflows/deploy-main.yml`.
+
+Логика:
+1. На каждый push в ветку `main` запускается job `build`.
+2. Если `build` успешен, запускается job `deploy`.
+3. `deploy` копирует проект на сервер в `/opt/tekstura` по SSH.
+4. На сервере запускается `scripts/deploy.sh`, который:
+   - ставит зависимости (`npm ci`);
+   - собирает проект (`npm run build`);
+   - применяет SQL-инициализацию БД (`npm run db:push`), если есть `sqlite3`;
+   - перезапускает `systemd`-сервис `tekstura.service`.
+
+### Что нужно добавить в GitHub Secrets
+
+В `Settings -> Secrets and variables -> Actions`:
+- `DEPLOY_HOST` (например, `212.22.82.209`)
+- `DEPLOY_PORT` (обычно `22`)
+- `DEPLOY_USER` (например, `root`)
+- `DEPLOY_PASSWORD` (SSH пароль пользователя)
+
+### Требования на сервере
+- Папка проекта: `/opt/tekstura`
+- Установлены: `node` (20+), `npm`, `sqlite3`, `systemd`
+- Продакшен `.env` лежит на сервере в `/opt/tekstura/.env` (workflow его не затирает)
+
 ## Важные заметки
 - Страница `src/pages/NewsDetailPage.tsx` сейчас не подключена к роутеру в `App.tsx`.
 - Юридические тексты в `src/data/legal.tsx` пока заполнены демо-контентом на английском.
