@@ -508,3 +508,48 @@
     margin-bottom: 20px;
   }
 }
+
+@media (max-width: 640px) {
+  .cases-list {
+    margin-top: 24px;
+  }
+
+  .cases-list__item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .cases-list__main {
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .cases-list__title {
+    font-size: clamp(0.95rem, 4.6vw, 1.1rem);
+    line-height: 1.16;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .cases-list__tag {
+    font-size: clamp(0.8rem, 3.7vw, 0.92rem);
+    line-height: 1.1;
+  }
+
+  .cases-list__view {
+    align-self: flex-end;
+    gap: 6px;
+    font-size: clamp(0.8rem, 3.6vw, 0.9rem);
+  }
+
+  .cases-list__view .arrow-icon {
+    width: 24px;
+    height: 5px;
+  }
+}
