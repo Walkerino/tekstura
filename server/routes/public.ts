@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { createExcerpt } from '../lib/content'
+import { sendAuditRequestEmail, sendContactRequestEmail } from '../lib/mailer'
 
 const auditSchema = z.object({
   email: z.string().email('Укажите корректный e-mail.'),
@@ -20,6 +21,7 @@ function serializeCaseListItem(item: {
   id: string
   slug: string
   title: string
+  description: string
   tag: string
   coverImageUrl: string
 }) {
@@ -27,6 +29,7 @@ function serializeCaseListItem(item: {
     id: item.id,
     slug: item.slug,
     title: item.title,
+    description: item.description,
     tag: item.tag,
     coverImageUrl: item.coverImageUrl,
   }
@@ -45,6 +48,7 @@ export default async function publicRoutes(app: FastifyInstance) {
         id: true,
         slug: true,
         title: true,
+        description: true,
         tag: true,
         coverImageUrl: true,
       },
@@ -86,6 +90,7 @@ export default async function publicRoutes(app: FastifyInstance) {
         id: item.id,
         slug: item.slug,
         title: item.title,
+        description: item.description,
         tag: item.tag,
         coverImageUrl: item.coverImageUrl,
         galleryImages: item.images.map((image) => image.imageUrl),
@@ -181,12 +186,29 @@ export default async function publicRoutes(app: FastifyInstance) {
         return { ok: true }
       }
 
+      const email = body.data.email.trim()
+
       await prisma.auditRequest.create({
         data: {
-          email: body.data.email.trim(),
+          email,
           source: body.data.source?.trim() || null,
         },
       })
+
+      try {
+        await sendAuditRequestEmail(email)
+      } catch (error) {
+        request.log.error(
+          { err: error, email },
+          'Не удалось отправить уведомление о заявке на бесплатный аудит.',
+        )
+
+        reply.code(500).send({
+          message:
+            'Заявка сохранена, но письмо не отправилось. Проверьте настройки SMTP и попробуйте снова.',
+        })
+        return
+      }
 
       return { ok: true }
     },
@@ -216,13 +238,36 @@ export default async function publicRoutes(app: FastifyInstance) {
         return { ok: true }
       }
 
+      const name = body.data.name.trim()
+      const email = body.data.email.trim()
+      const message = body.data.message.trim()
+
       await prisma.contactRequest.create({
         data: {
-          name: body.data.name.trim(),
-          email: body.data.email.trim(),
-          message: body.data.message.trim(),
+          name,
+          email,
+          message,
         },
       })
+
+      try {
+        await sendContactRequestEmail({
+          name,
+          email,
+          message,
+        })
+      } catch (error) {
+        request.log.error(
+          { err: error, email },
+          'Не удалось отправить уведомление о заявке с формы вопросов.',
+        )
+
+        reply.code(500).send({
+          message:
+            'Заявка сохранена, но письмо не отправилось. Проверьте настройки SMTP и попробуйте снова.',
+        })
+        return
+      }
 
       return { ok: true }
     },

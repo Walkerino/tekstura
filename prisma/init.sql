@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS "CaseItem" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "slug" TEXT NOT NULL UNIQUE,
   "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
   "tag" TEXT NOT NULL,
   "coverImageUrl" TEXT NOT NULL,
   "isPublished" BOOLEAN NOT NULL DEFAULT 0,

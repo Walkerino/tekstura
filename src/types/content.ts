@@ -1,5 +1,6 @@
 export type CaseSummary = {
   coverImageUrl: string
+  description: string
   id: string
   slug: string
   tag: string
@@ -33,6 +34,7 @@ export type AdminCase = CaseDetail & {
 
 export type AdminCasePayload = {
   coverImageUrl: string
+  description: string
   galleryImages: string[]
   tag: string
   title: string

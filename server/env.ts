@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { z } from 'zod'
 
 function setDefaultEnv(key: string, value: string) {
@@ -13,6 +14,13 @@ setDefaultEnv('JWT_SECRET', 'tekstura-local-secret')
 setDefaultEnv('ADMIN_EMAIL', 'admin@tekstura.local')
 setDefaultEnv('ADMIN_PASSWORD', 'ChangeMe123!')
 setDefaultEnv('UPLOAD_DIR', 'uploads')
+setDefaultEnv('AUDIT_NOTIFICATION_EMAIL', 'kleynovino@mail.ru')
+setDefaultEnv('SMTP_HOST', '')
+setDefaultEnv('SMTP_PORT', '465')
+setDefaultEnv('SMTP_SECURE', 'true')
+setDefaultEnv('SMTP_USER', '')
+setDefaultEnv('SMTP_PASSWORD', '')
+setDefaultEnv('SMTP_FROM', '')
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
@@ -22,6 +30,16 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email(),
   ADMIN_PASSWORD: z.string().min(8),
   UPLOAD_DIR: z.string().min(1),
+  AUDIT_NOTIFICATION_EMAIL: z.string().email(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535),
+  SMTP_SECURE: z
+    .string()
+    .transform((value) => value.toLowerCase() === 'true')
+    .pipe(z.boolean()),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  SMTP_FROM: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)

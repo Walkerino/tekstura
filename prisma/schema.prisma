@@ -19,6 +19,7 @@ model CaseItem {
   id            String      @id @default(cuid())
   slug          String      @unique
   title         String
+  description   String      @default("")
   tag           String
   coverImageUrl String
   isPublished   Boolean     @default(false)

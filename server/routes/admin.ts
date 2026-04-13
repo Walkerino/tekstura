@@ -18,6 +18,7 @@ const loginSchema = z.object({
 
 const caseSchema = z.object({
   title: z.string().trim().min(1),
+  description: z.string().trim().min(1),
   tag: z.string().trim().min(1),
   coverImageUrl: z.string().trim().min(1),
   galleryImages: z.array(z.string().trim().min(1)).default([]),
@@ -43,6 +44,7 @@ function serializeCase(item: {
   id: string
   slug: string
   title: string
+  description: string
   tag: string
   coverImageUrl: string
   createdAt: Date
@@ -53,6 +55,7 @@ function serializeCase(item: {
     id: item.id,
     slug: item.slug,
     title: item.title,
+    description: item.description,
     tag: item.tag,
     coverImageUrl: item.coverImageUrl,
     galleryImages: item.images.map((image) => image.imageUrl),
@@ -283,6 +286,7 @@ export default async function adminRoutes(app: FastifyInstance) {
       data: {
         slug,
         title: body.data.title,
+        description: body.data.description,
         tag: body.data.tag,
         coverImageUrl: body.data.coverImageUrl,
         isPublished: true,
@@ -342,6 +346,7 @@ export default async function adminRoutes(app: FastifyInstance) {
       data: {
         slug,
         title: body.data.title,
+        description: body.data.description,
         tag: body.data.tag,
         coverImageUrl: body.data.coverImageUrl,
         isPublished: true,
