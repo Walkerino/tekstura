@@ -19,6 +19,7 @@
 - Формы:
   - заявка на аудит `/api/forms/audit`;
   - контактная форма `/api/forms/contact`;
+  - email-уведомление основателю о новой заявке на аудит;
   - basic anti-spam через honeypot поле `website`.
 
 ## Технологический стек
@@ -196,6 +197,13 @@ npm run dev
 - `ADMIN_PASSWORD` — пароль администратора по умолчанию.
 - `PORT` — порт backend (по умолчанию `3001`).
 - `UPLOAD_DIR` — директория для загруженных файлов (по умолчанию `uploads`).
+- `AUDIT_NOTIFICATION_EMAIL` — почта получателя заявок на аудит (для теста: `kleynovino@mail.ru`).
+- `SMTP_HOST` — SMTP-хост для отправки уведомлений (например, `smtp.mail.ru`).
+- `SMTP_PORT` — SMTP-порт (обычно `465` для SSL).
+- `SMTP_SECURE` — использовать защищенное SMTP-соединение (`true`/`false`).
+- `SMTP_USER` — логин SMTP.
+- `SMTP_PASSWORD` — пароль приложения/SMTP.
+- `SMTP_FROM` — адрес отправителя (опционально; если пусто, используется `SMTP_USER`).
 
 ## Скрипты npm
 
