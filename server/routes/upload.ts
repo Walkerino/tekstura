@@ -9,14 +9,12 @@ const allowedMimeTypes = new Set([
   'image/jpeg',
   'image/png',
   'image/webp',
-  'image/svg+xml',
 ])
 
 const extensionByMimeType: Record<string, string> = {
   'image/jpeg': '.jpg',
   'image/png': '.png',
   'image/webp': '.webp',
-  'image/svg+xml': '.svg',
 }
 
 export default async function uploadRoutes(app: FastifyInstance) {
@@ -35,7 +33,7 @@ export default async function uploadRoutes(app: FastifyInstance) {
     }
 
     if (!allowedMimeTypes.has(file.mimetype)) {
-      reply.code(400).send({ message: 'Поддерживаются только изображения JPG, PNG, WEBP и SVG.' })
+      reply.code(400).send({ message: 'Поддерживаются только изображения JPG, PNG и WEBP.' })
       return
     }
 

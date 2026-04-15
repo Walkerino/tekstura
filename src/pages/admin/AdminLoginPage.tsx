@@ -12,8 +12,8 @@ export default function AdminLoginPage() {
   const location = useLocation()
   const [isChecking, setIsChecking] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [email, setEmail] = useState('admin@tekstura.local')
-  const [password, setPassword] = useState('ChangeMe123!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -65,14 +65,15 @@ export default function AdminLoginPage() {
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Tekstura Admin</p>
           <CardTitle className="text-2xl">Вход в админку</CardTitle>
           <CardDescription>
-            После входа откроется управление кейсами, новостями и отзывами. Логин и пароль можно
-            поменять в `.env`.
+            После входа откроется управление кейсами, новостями и отзывами. Используйте учетные
+            данные администратора.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <form
             className="space-y-4"
+            autoComplete="off"
             onSubmit={async (event) => {
               event.preventDefault()
               setIsSubmitting(true)
@@ -98,13 +99,34 @@ export default function AdminLoginPage() {
               }
             }}
           >
+            <input
+              type="text"
+              name="fake-username"
+              autoComplete="username"
+              tabIndex={-1}
+              className="hidden"
+              aria-hidden="true"
+            />
+            <input
+              type="password"
+              name="fake-password"
+              autoComplete="new-password"
+              tabIndex={-1}
+              className="hidden"
+              aria-hidden="true"
+            />
             <div className="space-y-2">
               <Label htmlFor="admin-email">E-mail</Label>
               <Input
                 id="admin-email"
+                name="admin-email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 type="email"
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 required
               />
             </div>
@@ -113,9 +135,13 @@ export default function AdminLoginPage() {
               <Label htmlFor="admin-password">Пароль</Label>
               <Input
                 id="admin-password"
+                name="admin-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 type="password"
+                autoComplete="new-password"
+                data-1p-ignore="true"
+                data-lpignore="true"
                 required
               />
             </div>

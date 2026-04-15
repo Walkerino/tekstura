@@ -49,6 +49,21 @@ async function start() {
     logger: env.NODE_ENV !== 'production',
   })
 
+  if (env.NODE_ENV === 'production') {
+    app.addHook('onSend', async (_request, reply) => {
+      reply.header('X-Content-Type-Options', 'nosniff')
+      reply.header('X-Frame-Options', 'DENY')
+      reply.header('Referrer-Policy', 'strict-origin-when-cross-origin')
+      reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+      reply.header('Cross-Origin-Opener-Policy', 'same-origin')
+      reply.header('Cross-Origin-Resource-Policy', 'same-origin')
+      reply.header(
+        'Content-Security-Policy',
+        "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'",
+      )
+    })
+  }
+
   await app.register(cookie)
   await app.register(jwt, {
     secret: env.JWT_SECRET,
@@ -108,7 +123,10 @@ async function start() {
     const statusCode = error.statusCode && error.statusCode >= 400 ? error.statusCode : 500
 
     reply.code(statusCode).send({
-      message: statusCode === 500 ? 'Внутренняя ошибка сервера.' : error.message,
+      message:
+        statusCode >= 500 || env.NODE_ENV === 'production'
+          ? 'Ошибка выполнения запроса.'
+          : error.message,
     })
   })
 
