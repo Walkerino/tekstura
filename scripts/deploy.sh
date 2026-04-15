@@ -4,6 +4,7 @@ set -euo pipefail
 APP_DIR="/opt/tekstura"
 SERVICE_NAME="tekstura.service"
 APP_PORT="3001"
+APP_STARTUP_TIMEOUT_SEC="60"
 
 on_error() {
   echo "Deployment failed. Showing diagnostics for ${SERVICE_NAME}..."
@@ -11,6 +12,21 @@ on_error() {
   journalctl -u "$SERVICE_NAME" -n 120 --no-pager || true
 }
 trap on_error ERR
+
+fail_deploy() {
+  echo "$1"
+  on_error
+  exit 1
+}
+
+read_env_value() {
+  local key="$1"
+  if [[ ! -f .env ]]; then
+    return 0
+  fi
+
+  grep -E "^[[:space:]]*${key}=" .env | tail -n 1 | cut -d'=' -f2- | tr -d "\"'[:space:]"
+}
 
 cd "$APP_DIR"
 
@@ -23,6 +39,11 @@ if command -v sqlite3 >/dev/null 2>&1; then
   npm run db:push
 else
   echo "sqlite3 CLI is not installed; skipping db:push. Existing DB file must already be present."
+fi
+
+jwt_secret="$(read_env_value JWT_SECRET)"
+if [[ -z "${jwt_secret}" || "${jwt_secret}" == "tekstura-local-secret" ]]; then
+  fail_deploy "Invalid /opt/tekstura/.env: set a non-default JWT_SECRET before restart."
 fi
 
 cat >/etc/systemd/system/${SERVICE_NAME} <<'UNIT'
@@ -48,34 +69,30 @@ systemctl enable "$SERVICE_NAME"
 systemctl restart "$SERVICE_NAME"
 systemctl --no-pager --full status "$SERVICE_NAME" | head -n 30
 
-if [[ -f .env ]]; then
-  env_port="$(grep -E '^[[:space:]]*PORT=' .env | tail -n 1 | cut -d'=' -f2- | tr -d "\"'[:space:]")"
-  if [[ -n "${env_port}" ]]; then
-    APP_PORT="${env_port}"
-  fi
+env_port="$(read_env_value PORT)"
+if [[ -n "${env_port}" ]]; then
+  APP_PORT="${env_port}"
 fi
 
 if command -v curl >/dev/null 2>&1; then
   HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/"
   healthcheck_ok=0
 
-  for _ in $(seq 1 30); do
+  for _ in $(seq 1 "${APP_STARTUP_TIMEOUT_SEC}"); do
     if curl -fsS "$HEALTHCHECK_URL" >/dev/null; then
       healthcheck_ok=1
       break
     fi
 
     if ! systemctl is-active --quiet "$SERVICE_NAME"; then
-      echo "Healthcheck failed: ${SERVICE_NAME} is not active."
-      exit 1
+      fail_deploy "Healthcheck failed: ${SERVICE_NAME} is not active."
     fi
 
     sleep 1
   done
 
   if [[ "$healthcheck_ok" -ne 1 ]]; then
-    echo "Healthcheck failed: backend is not reachable on ${HEALTHCHECK_URL} after 30s."
-    exit 1
+    fail_deploy "Healthcheck failed: backend is not reachable on ${HEALTHCHECK_URL} after ${APP_STARTUP_TIMEOUT_SEC}s."
   fi
 else
   echo "curl is not installed; skipping HTTP healthcheck."
