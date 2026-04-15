@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@tekstura.local'
+const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@tekstura.ru'
 const adminPassword = process.env.ADMIN_PASSWORD ?? 'ChangeMe123!'
 
 async function main() {

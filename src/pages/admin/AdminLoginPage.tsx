@@ -12,8 +12,8 @@ export default function AdminLoginPage() {
   const location = useLocation()
   const [isChecking, setIsChecking] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [email, setEmail] = useState('admin@tekstura.local')
-  const [password, setPassword] = useState('ChangeMe123!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -65,8 +65,7 @@ export default function AdminLoginPage() {
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Tekstura Admin</p>
           <CardTitle className="text-2xl">Вход в админку</CardTitle>
           <CardDescription>
-            После входа откроется управление кейсами, новостями и отзывами. Логин и пароль можно
-            поменять в `.env`.
+            После входа откроется управление кейсами, новостями и отзывами.
           </CardDescription>
         </CardHeader>
 

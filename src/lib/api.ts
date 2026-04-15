@@ -51,7 +51,7 @@ async function request<T>(path: string, options: RequestOptions = {}) {
     })
   } catch {
     throw new ApiError(
-      'Не удалось связаться с сервером. Проверь, что backend запущен через `npm run dev` или `npm run dev:api`.',
+      'Не удалось связаться с сервером. Повторите попытку позже или свяжитесь с поддержкой.',
       0,
     )
   }

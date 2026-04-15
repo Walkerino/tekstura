@@ -14,7 +14,7 @@
 - Админка:
   - вход по cookie-based JWT сессии;
   - CRUD для кейсов, новостей и отзывов;
-  - загрузка изображений в локальную папку `uploads/`;
+  - загрузка изображений в папку `uploads/`;
   - дашборд со счетчиками контента и заявок.
 - Формы:
   - заявка на аудит `/api/forms/audit`;
@@ -54,7 +54,7 @@
 1. Компонент страницы вызывает функцию из `src/lib/api.ts`.
 2. API-клиент отправляет запрос на `/api/...`.
 3. Ответ валидируется на уровне статуса/формата и возвращается странице.
-4. Страница обновляет локальный state и рендерит UI.
+4. Страница обновляет state и рендерит UI.
 
 ### 2) Backend архитектура
 
@@ -157,7 +157,7 @@
 │   └── types/
 │       └── content.ts
 ├── uploads/               # пользовательские загрузки
-└── vite.config.ts         # dev proxy /api и /uploads
+└── vite.config.ts         # proxy /api и /uploads
 ```
 
 ## Быстрый старт
@@ -184,7 +184,7 @@ npm run dev
 Админка: `http://localhost:5173/admin/login`
 
 По умолчанию:
-- email: `admin@tekstura.local`
+- email: `admin@tekstura.ru`
 - пароль: `ChangeMe123!`
 
 ## Переменные окружения
@@ -197,7 +197,7 @@ npm run dev
 - `ADMIN_PASSWORD` — пароль администратора по умолчанию.
 - `PORT` — порт backend (по умолчанию `3001`).
 - `UPLOAD_DIR` — директория для загруженных файлов (по умолчанию `uploads`).
-- `AUDIT_NOTIFICATION_EMAIL` — почта получателя заявок на аудит (для теста: `kleynovino@mail.ru`).
+- `AUDIT_NOTIFICATION_EMAIL` — почта получателя заявок на аудит (например, `kleynovino@mail.ru`).
 - `SMTP_HOST` — SMTP-хост для отправки уведомлений (например, `smtp.mail.ru`).
 - `SMTP_PORT` — SMTP-порт (обычно `465` для SSL).
 - `SMTP_SECURE` — использовать защищенное SMTP-соединение (`true`/`false`).
@@ -263,11 +263,10 @@ npm run start
 
 ## Важные заметки
 - Страница `src/pages/NewsDetailPage.tsx` сейчас не подключена к роутеру в `App.tsx`.
-- Юридические тексты в `src/data/legal.tsx` пока заполнены демо-контентом на английском.
-- В проде обязательно задайте сильный `JWT_SECRET` и смените дефолтные admin credentials.
+- Для production обязательно задайте сильный `JWT_SECRET` и смените дефолтные admin credentials.
 
 ## Что можно улучшить дальше
 - Добавить нормальные миграции Prisma (`prisma migrate`) вместо SQL bootstrap.
 - Добавить роли/нескольких администраторов и аудит действий.
 - Добавить тесты: API integration (Fastify) и component tests (React).
-- Подключить object storage (S3/MinIO) вместо локального `uploads/`.
+- Подключить object storage (S3/MinIO) вместо хранения файлов в `uploads/`.
