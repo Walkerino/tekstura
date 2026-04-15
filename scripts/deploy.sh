@@ -44,7 +44,12 @@ cd "$APP_DIR"
 mkdir -p uploads
 touch .env
 
-npm ci
+# Stop service before reinstalling node_modules to avoid restart loops on half-installed deps.
+systemctl stop "$SERVICE_NAME" || true
+systemctl reset-failed "$SERVICE_NAME" || true
+
+npm ci --include=dev
+npm run db:generate
 npm run build
 
 if command -v sqlite3 >/dev/null 2>&1; then
@@ -101,7 +106,7 @@ if command -v curl >/dev/null 2>&1; then
   healthcheck_ok=0
 
   for _ in $(seq 1 "${APP_STARTUP_TIMEOUT_SEC}"); do
-    if curl -fsS "$HEALTHCHECK_URL" >/dev/null; then
+    if curl -sS "$HEALTHCHECK_URL" >/dev/null; then
       healthcheck_ok=1
       break
     fi
