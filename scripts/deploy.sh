@@ -28,9 +28,21 @@ read_env_value() {
   grep -E "^[[:space:]]*${key}=" .env | tail -n 1 | cut -d'=' -f2- | tr -d "\"'[:space:]"
 }
 
+set_env_value() {
+  local key="$1"
+  local value="$2"
+
+  if grep -qE "^[[:space:]]*${key}=" .env; then
+    sed -i "s|^[[:space:]]*${key}=.*|${key}=\"${value}\"|" .env
+  else
+    echo "${key}=\"${value}\"" >>.env
+  fi
+}
+
 cd "$APP_DIR"
 
 mkdir -p uploads
+touch .env
 
 npm ci
 npm run build
@@ -43,7 +55,17 @@ fi
 
 jwt_secret="$(read_env_value JWT_SECRET)"
 if [[ -z "${jwt_secret}" || "${jwt_secret}" == "tekstura-local-secret" ]]; then
-  fail_deploy "Invalid /opt/tekstura/.env: set a non-default JWT_SECRET before restart."
+  if command -v openssl >/dev/null 2>&1; then
+    generated_jwt_secret="$(openssl rand -hex 32)"
+  elif command -v node >/dev/null 2>&1; then
+    generated_jwt_secret="$(node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))")"
+  else
+    fail_deploy "Cannot generate JWT_SECRET: neither openssl nor node is available."
+  fi
+
+  set_env_value "JWT_SECRET" "${generated_jwt_secret}"
+  chmod 600 .env || true
+  echo "JWT_SECRET was missing/default and has been generated automatically."
 fi
 
 cat >/etc/systemd/system/${SERVICE_NAME} <<'UNIT'
