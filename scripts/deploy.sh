@@ -3,6 +3,7 @@ set -euo pipefail
 
 APP_DIR="/opt/tekstura"
 SERVICE_NAME="tekstura.service"
+APP_PORT="3001"
 
 on_error() {
   echo "Deployment failed. Showing diagnostics for ${SERVICE_NAME}..."
@@ -47,9 +48,33 @@ systemctl enable "$SERVICE_NAME"
 systemctl restart "$SERVICE_NAME"
 systemctl --no-pager --full status "$SERVICE_NAME" | head -n 30
 
+if [[ -f .env ]]; then
+  env_port="$(grep -E '^[[:space:]]*PORT=' .env | tail -n 1 | cut -d'=' -f2- | tr -d "\"'[:space:]")"
+  if [[ -n "${env_port}" ]]; then
+    APP_PORT="${env_port}"
+  fi
+fi
+
 if command -v curl >/dev/null 2>&1; then
-  if ! curl -fsS "http://127.0.0.1:3001/" >/dev/null; then
-    echo "Healthcheck failed: backend is not reachable on 127.0.0.1:3001"
+  HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/"
+  healthcheck_ok=0
+
+  for _ in $(seq 1 30); do
+    if curl -fsS "$HEALTHCHECK_URL" >/dev/null; then
+      healthcheck_ok=1
+      break
+    fi
+
+    if ! systemctl is-active --quiet "$SERVICE_NAME"; then
+      echo "Healthcheck failed: ${SERVICE_NAME} is not active."
+      exit 1
+    fi
+
+    sleep 1
+  done
+
+  if [[ "$healthcheck_ok" -ne 1 ]]; then
+    echo "Healthcheck failed: backend is not reachable on ${HEALTHCHECK_URL} after 30s."
     exit 1
   fi
 else
