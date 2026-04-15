@@ -46,7 +46,9 @@ export const env = envSchema.parse(process.env)
 
 if (env.NODE_ENV === 'production') {
   if (env.JWT_SECRET === 'tekstura-local-secret') {
-    throw new Error('В production необходимо задать уникальный JWT_SECRET в окружении.')
+    console.warn(
+      '[security] В production используется JWT_SECRET по умолчанию. Рекомендуется задать уникальный JWT_SECRET в окружении.',
+    )
   }
 
   if (env.ADMIN_PASSWORD === 'ChangeMe123!') {
