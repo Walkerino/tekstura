@@ -5,11 +5,18 @@ APP_DIR="/opt/tekstura"
 SERVICE_NAME="tekstura.service"
 APP_PORT="3001"
 APP_STARTUP_TIMEOUT_SEC="60"
+SERVICE_WAS_ACTIVE="0"
 
 on_error() {
   echo "Deployment failed. Showing diagnostics for ${SERVICE_NAME}..."
   systemctl --no-pager --full status "$SERVICE_NAME" || true
-  journalctl -u "$SERVICE_NAME" -n 120 --no-pager || true
+  journalctl -u "$SERVICE_NAME" --since "-10 min" --no-pager || true
+
+  if [[ "${SERVICE_WAS_ACTIVE}" == "1" ]]; then
+    echo "Attempting to bring ${SERVICE_NAME} back after failed deploy..."
+    systemctl restart "$SERVICE_NAME" || true
+    systemctl --no-pager --full status "$SERVICE_NAME" || true
+  fi
 }
 trap on_error ERR
 
@@ -43,6 +50,10 @@ cd "$APP_DIR"
 
 mkdir -p uploads
 touch .env
+
+if systemctl is-active --quiet "$SERVICE_NAME"; then
+  SERVICE_WAS_ACTIVE="1"
+fi
 
 # Stop service before reinstalling node_modules to avoid restart loops on half-installed deps.
 systemctl stop "$SERVICE_NAME" || true
