@@ -36,8 +36,30 @@ async function ensureDatabase() {
   const dbPath = resolveSqliteDbPath(env.DATABASE_URL)
   await mkdir(path.dirname(dbPath), { recursive: true })
 
+  if (!existsSync(initSqlPath)) {
+    throw new Error(`Не найден SQL-файл инициализации: ${initSqlPath}`)
+  }
+
+  if (!existsSync(dbPath)) {
+    throw new Error(
+      `SQLite база не найдена: ${dbPath}. Создайте файл БД через scripts/deploy.sh (npm run db:push) перед запуском сервиса.`,
+    )
+  }
+
+  // Best-effort init: if sqlite3 CLI is unavailable on host, app should still start with existing DB.
   await exec(`sqlite3 "${dbPath}" < "${initSqlPath}"`, {
     cwd: projectRoot,
+  }).catch((error) => {
+    const stderr = typeof error?.stderr === 'string' ? error.stderr : ''
+    const stdout = typeof error?.stdout === 'string' ? error.stdout : ''
+    const output = `${stderr}\n${stdout}`.trim()
+
+    if (output.includes('sqlite3: not found') || output.includes('command not found')) {
+      console.warn('[startup] sqlite3 CLI not found, skipping DB bootstrap at runtime.')
+      return
+    }
+
+    throw error
   })
 }
 
