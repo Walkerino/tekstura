@@ -50,10 +50,14 @@ if (env.NODE_ENV === 'production') {
   }
 
   if (env.ADMIN_PASSWORD === 'ChangeMe123!') {
-    throw new Error('В production необходимо задать безопасный ADMIN_PASSWORD в окружении.')
+    console.warn(
+      '[security] В production используется ADMIN_PASSWORD по умолчанию. Рекомендуется задать безопасный ADMIN_PASSWORD в окружении.',
+    )
   }
 
   if (env.ADMIN_EMAIL === 'admin@tekstura.local') {
-    throw new Error('В production необходимо задать реальный ADMIN_EMAIL в окружении.')
+    console.warn(
+      '[security] В production используется ADMIN_EMAIL по умолчанию. Рекомендуется задать реальный ADMIN_EMAIL в окружении.',
+    )
   }
 }

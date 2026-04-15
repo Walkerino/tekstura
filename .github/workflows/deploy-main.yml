@@ -51,14 +51,6 @@ jobs:
           overwrite: true
           rm: false
           strip_components: 0
-          exclude: >
-            .git,
-            .github,
-            node_modules,
-            dist,
-            prisma/dev.db,
-            uploads
-
       - name: Run remote deploy script
         uses: appleboy/ssh-action@v1.2.0
         with:
