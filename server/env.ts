@@ -43,23 +43,3 @@ const envSchema = z.object({
 })
 
 export const env = envSchema.parse(process.env)
-
-if (env.NODE_ENV === 'production') {
-  if (env.JWT_SECRET === 'tekstura-local-secret') {
-    console.warn(
-      '[security] В production используется JWT_SECRET по умолчанию. Рекомендуется задать уникальный JWT_SECRET в окружении.',
-    )
-  }
-
-  if (env.ADMIN_PASSWORD === 'ChangeMe123!') {
-    console.warn(
-      '[security] В production используется ADMIN_PASSWORD по умолчанию. Рекомендуется задать безопасный ADMIN_PASSWORD в окружении.',
-    )
-  }
-
-  if (env.ADMIN_EMAIL === 'admin@tekstura.local') {
-    console.warn(
-      '[security] В production используется ADMIN_EMAIL по умолчанию. Рекомендуется задать реальный ADMIN_EMAIL в окружении.',
-    )
-  }
-}

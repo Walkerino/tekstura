@@ -144,41 +144,30 @@ async function resolveNewsSlug(title: string, currentId?: string) {
 }
 
 export default async function adminRoutes(app: FastifyInstance) {
-  app.post(
-    '/api/admin/auth/login',
-    {
-      config: {
-        rateLimit: {
-          max: 5,
-          timeWindow: '15 minutes',
-        },
+  app.post('/api/admin/auth/login', async (request, reply) => {
+    const body = loginSchema.safeParse(request.body)
+
+    if (!body.success) {
+      reply.code(400).send({ message: 'Некорректные данные для входа.' })
+      return
+    }
+
+    const session = await verifyAdminCredentials(body.data.email, body.data.password)
+
+    if (!session) {
+      reply.code(401).send({ message: 'Неверный e-mail или пароль.' })
+      return
+    }
+
+    setAdminSession(request, reply, session)
+
+    return {
+      authenticated: true,
+      user: {
+        email: session.email,
       },
-    },
-    async (request, reply) => {
-      const body = loginSchema.safeParse(request.body)
-
-      if (!body.success) {
-        reply.code(400).send({ message: 'Некорректные данные для входа.' })
-        return
-      }
-
-      const session = await verifyAdminCredentials(body.data.email.trim(), body.data.password)
-
-      if (!session) {
-        reply.code(401).send({ message: 'Неверный e-mail или пароль.' })
-        return
-      }
-
-      setAdminSession(request, reply, session)
-
-      return {
-        authenticated: true,
-        user: {
-          email: session.email,
-        },
-      }
-    },
-  )
+    }
+  })
 
   app.post('/api/admin/auth/logout', async (_request, reply) => {
     clearAdminSession(reply)

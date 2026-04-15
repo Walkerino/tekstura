@@ -36,30 +36,8 @@ async function ensureDatabase() {
   const dbPath = resolveSqliteDbPath(env.DATABASE_URL)
   await mkdir(path.dirname(dbPath), { recursive: true })
 
-  if (!existsSync(initSqlPath)) {
-    throw new Error(`Не найден SQL-файл инициализации: ${initSqlPath}`)
-  }
-
-  if (!existsSync(dbPath)) {
-    throw new Error(
-      `SQLite база не найдена: ${dbPath}. Создайте файл БД через scripts/deploy.sh (npm run db:push) перед запуском сервиса.`,
-    )
-  }
-
-  // Best-effort init: if sqlite3 CLI is unavailable on host, app should still start with existing DB.
   await exec(`sqlite3 "${dbPath}" < "${initSqlPath}"`, {
     cwd: projectRoot,
-  }).catch((error) => {
-    const stderr = typeof error?.stderr === 'string' ? error.stderr : ''
-    const stdout = typeof error?.stdout === 'string' ? error.stdout : ''
-    const output = `${stderr}\n${stdout}`.trim()
-
-    if (output.includes('sqlite3: not found') || output.includes('command not found')) {
-      console.warn('[startup] sqlite3 CLI not found, skipping DB bootstrap at runtime.')
-      return
-    }
-
-    throw error
   })
 }
 
@@ -70,21 +48,6 @@ async function start() {
   const app = Fastify({
     logger: env.NODE_ENV !== 'production',
   })
-
-  if (env.NODE_ENV === 'production') {
-    app.addHook('onSend', async (_request, reply) => {
-      reply.header('X-Content-Type-Options', 'nosniff')
-      reply.header('X-Frame-Options', 'DENY')
-      reply.header('Referrer-Policy', 'strict-origin-when-cross-origin')
-      reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-      reply.header('Cross-Origin-Opener-Policy', 'same-origin')
-      reply.header('Cross-Origin-Resource-Policy', 'same-origin')
-      reply.header(
-        'Content-Security-Policy',
-        "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'",
-      )
-    })
-  }
 
   await app.register(cookie)
   await app.register(jwt, {
@@ -145,10 +108,7 @@ async function start() {
     const statusCode = error.statusCode && error.statusCode >= 400 ? error.statusCode : 500
 
     reply.code(statusCode).send({
-      message:
-        statusCode >= 500 || env.NODE_ENV === 'production'
-          ? 'Ошибка выполнения запроса.'
-          : error.message,
+      message: statusCode === 500 ? 'Внутренняя ошибка сервера.' : error.message,
     })
   })
 

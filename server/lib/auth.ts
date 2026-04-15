@@ -86,8 +86,7 @@ export function setAdminSession(
   reply.setCookie(adminCookieName, token, {
     httpOnly: true,
     path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: env.NODE_ENV === 'production',
   })
 }
@@ -95,7 +94,7 @@ export function setAdminSession(
 export function clearAdminSession(reply: FastifyReply) {
   reply.clearCookie(adminCookieName, {
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: env.NODE_ENV === 'production',
   })
 }
