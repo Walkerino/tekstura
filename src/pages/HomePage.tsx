@@ -465,7 +465,7 @@ export default function HomePage() {
             </div>
 
             <div className="about__mascot">
-              <img src="/assets/hero-mascot3.png" alt="Талисман Tekstura" />
+              <img src="/assets/hero-mascot2.png" alt="Талисман Tekstura" />
             </div>
           </div>
         </section>
