@@ -306,6 +306,7 @@ export default function HomePage() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
   const [contentError, setContentError] = useState<string | null>(null)
   const [auditEmail, setAuditEmail] = useState('')
+  const [auditConsent, setAuditConsent] = useState(false)
   const [auditStatus, setAuditStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [auditError, setAuditError] = useState<string | null>(null)
   const [contactForm, setContactForm] = useState({
@@ -314,6 +315,7 @@ export default function HomePage() {
     name: '',
     website: '',
   })
+  const [contactConsent, setContactConsent] = useState(false)
   const [contactStatus, setContactStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [contactError, setContactError] = useState<string | null>(null)
   const heroTypeWidth = Math.max(...heroTitleVariants.map((variant) => variant.length))
@@ -463,7 +465,7 @@ export default function HomePage() {
             </div>
 
             <div className="about__mascot">
-              <img src="/assets/hero-mascot.png" alt="Талисман Tekstura" />
+              <img src="/assets/hero-mascot3.png" alt="Талисман Tekstura" />
             </div>
           </div>
         </section>
@@ -563,16 +565,25 @@ export default function HomePage() {
               className="newsletter__form"
               onSubmit={async (event) => {
                 event.preventDefault()
+
+                if (!auditConsent) {
+                  setAuditStatus('error')
+                  setAuditError('Подтвердите согласие на обработку персональных данных.')
+                  return
+                }
+
                 setAuditStatus('loading')
                 setAuditError(null)
 
                 try {
                   await submitAuditForm({
+                    consentToProcessing: auditConsent,
                     email: auditEmail,
                     source: 'landing-page',
                     website: '',
                   })
                   setAuditEmail('')
+                  setAuditConsent(false)
                   setAuditStatus('idle')
                   openSuccessModal('Спасибо. Мы свяжемся с вами и согласуем удобный формат.')
                 } catch (error) {
@@ -581,14 +592,23 @@ export default function HomePage() {
                 }
               }}
             >
-              <input
-                type="email"
-                name="email"
-                placeholder="Ваш E-mail"
-                value={auditEmail}
-                onChange={(event) => setAuditEmail(event.target.value)}
-                required
-              />
+              <div className="newsletter__row">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Ваш E-mail"
+                  value={auditEmail}
+                  onChange={(event) => setAuditEmail(event.target.value)}
+                  required
+                />
+                <button
+                  className="button button--primary newsletter__submit"
+                  type="submit"
+                  disabled={auditStatus === 'loading' || !auditConsent}
+                >
+                  {auditStatus === 'loading' ? 'ОТПРАВКА...' : 'Записаться'}
+                </button>
+              </div>
               <input
                 className="form-honeypot"
                 type="text"
@@ -597,9 +617,19 @@ export default function HomePage() {
                 autoComplete="off"
                 aria-hidden="true"
               />
-              <button className="button button--primary newsletter__submit" type="submit" disabled={auditStatus === 'loading'}>
-                {auditStatus === 'loading' ? 'ОТПРАВКА...' : 'Записаться'}
-              </button>
+              <div className="form-consent newsletter__consent">
+                <input
+                  id="audit-consent"
+                  type="checkbox"
+                  checked={auditConsent}
+                  onChange={(event) => setAuditConsent(event.target.checked)}
+                  required
+                />
+                <label htmlFor="audit-consent">
+                  Я соглашаюсь на обработку персональных данных и принимаю{' '}
+                  <Link to="/privacy-policy">политику конфиденциальности</Link>.
+                </label>
+              </div>
             </form>
 
             {auditError ? <p className="form-status form-status--error">{auditError}</p> : null}
@@ -786,17 +816,28 @@ export default function HomePage() {
                 className="contact-form"
                 onSubmit={async (event) => {
                   event.preventDefault()
+
+                  if (!contactConsent) {
+                    setContactStatus('error')
+                    setContactError('Подтвердите согласие на обработку персональных данных.')
+                    return
+                  }
+
                   setContactStatus('loading')
                   setContactError(null)
 
                   try {
-                    await submitContactForm(contactForm)
+                    await submitContactForm({
+                      ...contactForm,
+                      consentToProcessing: contactConsent,
+                    })
                     setContactForm({
                       email: '',
                       message: '',
                       name: '',
                       website: '',
                     })
+                    setContactConsent(false)
                     setContactStatus('idle')
                     openSuccessModal('Ваш вопрос успешно отправлен.')
                   } catch (error) {
@@ -847,7 +888,24 @@ export default function HomePage() {
                     setContactForm((current) => ({ ...current, website: event.target.value }))
                   }
                 />
-                <button className="button button--primary contact-form__submit" type="submit" disabled={contactStatus === 'loading'}>
+                <div className="form-consent">
+                  <input
+                    id="contact-consent"
+                    type="checkbox"
+                    checked={contactConsent}
+                    onChange={(event) => setContactConsent(event.target.checked)}
+                    required
+                  />
+                  <label htmlFor="contact-consent">
+                    Я соглашаюсь на обработку персональных данных и принимаю{' '}
+                    <Link to="/privacy-policy">политику конфиденциальности</Link>.
+                  </label>
+                </div>
+                <button
+                  className="button button--primary contact-form__submit"
+                  type="submit"
+                  disabled={contactStatus === 'loading' || !contactConsent}
+                >
                   {contactStatus === 'loading' ? 'Отправка...' : 'Отправить'}
                 </button>
                 {contactError ? <p className="form-status form-status--error">{contactError}</p> : null}

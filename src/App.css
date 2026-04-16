@@ -433,7 +433,7 @@
 
 .about__content {
   display: grid;
-  grid-template-columns: 588px 418px;
+  grid-template-columns: 560px 500px;
   justify-content: space-between;
   align-items: center;
   gap: 48px;
@@ -462,7 +462,7 @@
 }
 
 .about__mascot img {
-  width: 418px;
+  width: 500px;
   max-width: 100%;
 }
 
@@ -752,8 +752,17 @@
 
 .newsletter__form {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   margin-top: 48px;
+}
+
+.newsletter__row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
 }
 
 .newsletter__form input,
@@ -768,6 +777,40 @@
   font-size: 1rem;
   line-height: 1.4;
   letter-spacing: 0.004em;
+}
+
+.form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  color: var(--color-text-soft);
+  font-family: var(--font-geist);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.form-consent input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--color-orange);
+  flex: 0 0 auto;
+}
+
+.form-consent label {
+  margin: 0;
+}
+
+.form-consent a {
+  color: var(--color-orange);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.newsletter__consent {
+  margin-top: 4px;
+  max-width: 680px;
 }
 
 .newsletter__form input {
@@ -1965,7 +2008,7 @@
   }
 
   .about__mascot img {
-    width: 418px;
+    width: 500px;
   }
 
   .services__grid {
@@ -2017,7 +2060,6 @@
 
   .newsletter__form {
     width: 100%;
-    justify-content: center;
     margin-top: 0;
   }
 
@@ -2224,7 +2266,7 @@
   }
 
   .about__mascot img {
-    width: 314px;
+    width: 360px;
   }
 
   .services__grid {
@@ -2317,9 +2359,12 @@
   }
 
   .newsletter__form {
-    flex-direction: column;
     width: 100%;
     margin-top: 0;
+  }
+
+  .newsletter__row {
+    flex-direction: column;
   }
 
   .newsletter__form input {
@@ -2333,6 +2378,11 @@
     min-height: 47px;
     padding-block: 12px;
     font-size: 15px;
+  }
+
+  .form-consent {
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   .newsletter__note {

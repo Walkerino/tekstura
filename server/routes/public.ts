@@ -5,12 +5,18 @@ import { createExcerpt } from '../lib/content'
 import { sendAuditRequestEmail, sendContactRequestEmail } from '../lib/mailer'
 
 const auditSchema = z.object({
+  consentToProcessing: z
+    .boolean()
+    .refine((value) => value, 'Подтвердите согласие на обработку персональных данных.'),
   email: z.string().email('Укажите корректный e-mail.'),
   source: z.string().trim().max(120).optional(),
   website: z.string().trim().max(120).optional(),
 })
 
 const contactSchema = z.object({
+  consentToProcessing: z
+    .boolean()
+    .refine((value) => value, 'Подтвердите согласие на обработку персональных данных.'),
   name: z.string().trim().min(2, 'Укажите имя.').max(120),
   email: z.string().email('Укажите корректный e-mail.'),
   message: z.string().trim().min(5, 'Опишите вопрос подробнее.').max(4000),

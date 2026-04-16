@@ -99,7 +99,12 @@ export async function fetchNewsItem(slug: string) {
   return response.item
 }
 
-export async function submitAuditForm(payload: { email: string; source?: string; website?: string }) {
+export async function submitAuditForm(payload: {
+  consentToProcessing: boolean
+  email: string
+  source?: string
+  website?: string
+}) {
   return request<{ ok: true }>('/api/forms/audit', {
     body: payload,
     method: 'POST',
@@ -107,6 +112,7 @@ export async function submitAuditForm(payload: { email: string; source?: string;
 }
 
 export async function submitContactForm(payload: {
+  consentToProcessing: boolean
   email: string
   message: string
   name: string
